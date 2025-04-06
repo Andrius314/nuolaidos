@@ -1,0 +1,104 @@
+import { v4 as uuidv4 } from 'uuid';
+
+document.addEventListener('DOMContentLoaded', () => {
+    const cardImageUpload = document.getElementById('card-image-upload');
+    const cardCategoryInput = document.getElementById('card-category');
+    const addCardButton = document.getElementById('add-card-button');
+    const cardsList = document.getElementById('cards-list');
+    const fullscreenOverlay = document.createElement('div');
+    fullscreenOverlay.classList.add('fullscreen-card-overlay');
+    document.body.appendChild(fullscreenOverlay);
+    const categorySelect = document.getElementById('category-select');
+
+    let cards = []; // Kortelės bus saugomos čia (kol kas laikinos atmintyje)
+
+    function displayCards(filterCategory = 'visos') {
+        cardsList.innerHTML = ''; // Išvalyti esamą kortelių sąrašą
+        let filteredCards = [...cards]; // Create a copy to filter
+
+        if (filterCategory !== 'visos' && filterCategory !== 'dažniausiai') {
+            filteredCards = cards.filter(card => card.category === filterCategory);
+        } else if (filterCategory === 'dažniausiai') {
+            filteredCards.sort((a, b) => b.usageCount - a.usageCount); // Sort by usage count desc
+            filteredCards = filteredCards.slice(0, 5); // Show top 5, adjust as needed
+        }
+
+        filteredCards.forEach(card => {
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('card');
+            cardElement.innerHTML = `
+                <img src="${card.imageSrc}" alt="Nuolaidų kortelė">
+                <p>Kategorija: ${card.category}</p>
+            `;
+            cardElement.addEventListener('click', () => openFullscreenCard(card));
+            cardsList.appendChild(cardElement);
+        });
+    }
+
+    function updateCategoryFilter() {
+        const categories = [...new Set(cards.map(card => card.category))]; // Get unique categories
+        // Remove old options except the first two (Visos and Dažniausiai)
+        while (categorySelect.options.length > 2) {
+            categorySelect.remove(2);
+        }
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            categorySelect.appendChild(option);
+        });
+    }
+
+    function openFullscreenCard(card) {
+        fullscreenOverlay.innerHTML = `
+            <div class="fullscreen-card-content">
+                <img src="${card.imageSrc}" alt="Nuolaidų kortelė">
+                <p>Kategorija: ${card.category}</p>
+            </div>
+        `;
+        fullscreenOverlay.classList.add('active');
+        fullscreenOverlay.addEventListener('click', closeFullscreenCard); // Close on overlay click
+        // Increment usage count when card is opened
+        card.usageCount = (card.usageCount || 0) + 1;
+        // No need to redisplay all cards here, usage count update is in memory
+    }
+
+    function closeFullscreenCard(event) {
+        if (event.target === fullscreenOverlay) { // Only close if clicked on overlay itself
+            fullscreenOverlay.classList.remove('active');
+            fullscreenOverlay.removeEventListener('click', closeFullscreenCard);
+        }
+    }
+
+    addCardButton.addEventListener('click', () => {
+        const imageFile = cardImageUpload.files[0];
+        const category = cardCategoryInput.value;
+
+        if (imageFile && category) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const card = {
+                    id: uuidv4(), // Generuojam unikalų ID
+                    imageSrc: e.target.result,
+                    category: category,
+                    usageCount: 0 // Initialize usage count
+                };
+                cards.push(card);
+                displayCards(categorySelect.value); // Display with current filter
+                updateCategoryFilter(); // Update categories in filter
+                cardImageUpload.value = ''; // Išvalyti failo įvestį
+                cardCategoryInput.value = ''; // Išvalyti kategorijos įvestį
+            }
+            reader.readAsDataURL(imageFile);
+        } else {
+            alert('Prašome pasirinkti nuotrauką ir įvesti kategoriją.');
+        }
+    });
+
+    categorySelect.addEventListener('change', () => {
+        displayCards(categorySelect.value);
+    });
+
+    // Initial display
+    displayCards('visos');
+});

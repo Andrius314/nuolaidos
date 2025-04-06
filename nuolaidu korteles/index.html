@@ -1,0 +1,63 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuolaidų Kortelės</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="importmap">
+        {
+          "imports": {
+            "uuid": "https://cdn.jsdelivr.net/npm/uuid@9.0.1/+esm"
+          }
+        }
+      </script>
+    <script src="script.js" type="module"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li>
+                    <button id="category-management-button">Kategorijų Valdymas</button>
+                    <div id="category-management-section" class="dropdown-content">
+                        <h2>Kategorijų Valdymas</h2>
+                        <input type="text" id="new-category-name" placeholder="Nauja kategorija">
+                        <button id="add-category-button">Pridėti Kategoriją</button>
+                        <ul id="category-list">
+                            <!-- Kategorijos bus dinamiškai pridedamos čia -->
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <button id="add-card-button-menu">Pridėti Kortelę</button>
+                    <div id="upload-section" class="dropdown-content">
+                        <h2>Pridėti Kortelę</h2>
+                        <input type="file" id="card-image-upload" accept="image/*">
+                        <select id="card-category-select">
+                            <option value="">Pasirinkite kategoriją</option>
+                            <!-- Kategorijos bus dinamiškai pridedamos čia -->
+                        </select>
+                        <button id="add-card-button">Pridėti Kortelę</button>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div id="cards-container">
+        <h2>Kortelės</h2>
+        <div id="category-filter">
+            <label for="category-select">Rūšiuoti pagal kategoriją:</label>
+            <select id="category-select">
+                <option value="visos">Visos Kategorijos</option>
+                <option value="dažniausiai">Dažniausiai naudojamos</option>
+                <!-- Kategorijos bus dinamiškai pridedamos čia -->
+            </select>
+        </div>
+        <div id="cards-list">
+            <!-- Kortelės bus čia -->
+        </div>
+    </div>
+
+</body>
+</html>
